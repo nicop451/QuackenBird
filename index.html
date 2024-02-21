@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js" integrity="sha512-uaz5GpnQoE6t5echKlX8P52czvsIGgLPcvlzfvRubLZ1Hp8JemUDnbUiAahbVtPb+jUVrNETuXvAhDDF/N3M4w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+        <title>Quackenbird</title>
+
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+            }
+            #score {
+                position: absolute;
+                top: 0;
+                left: 0;
+                font-size: 20pt;
+                padding: 10px;
+                border-bottom-right-radius: 8px;
+                margin: 0;
+                background-color: cadetblue;
+            }
+        </style>
+    </head>
+
+    <body>
+        <p id="score">Score: </p>
+        
+        <script src="Quack.js"></script>
+        <script src="Curve.js"></script>
+        <script>
+            let quack;
+            let curve;
+            let backImage;
+            let n = 0;
+            let elapsedTime = 0;
+
+            function setup()
+            {
+               createCanvas(windowWidth, windowHeight);
+
+               quack = new Quack();
+               curve = new Curve(quack);
+
+               quack.curve = curve;
+
+               backImage = loadImage('Asset/BackGroundTile.png');
+            }
+
+            function draw()
+            {
+               elapsedTime += deltaTime * 0.002;
+               clear();
+               colorMode(HSB, 360, 100, 100);
+               background(color(elapsedTime % 360, 50, 70));
+               colorMode(RGB, 255, 255, 255);
+               // n++;
+               //  for(let x = 0; x < 100; x++) {
+               //    for(let y = 0; y < 100; y++)
+               //    {
+               //       image(backImage, (x * 100) - n * 15, ((y * 100) - quack.y) - 10000, 100, 100);
+               //    }
+               //  }
+
+
+               // if(quack.isDead != true) 
+               // {
+               quack.update();
+               curve.update();
+               // }ser
+               // else
+               // {
+                  
+               // }
+            }
+
+            function keyPressed()
+            {
+               if (keyCode == 32)
+               {
+                  quack.isJumping = true;
+                  quack.angularAcc += (quack.angularPos + 1)*-0.1;
+                  quack.acceleration += 0.1;
+               }
+            }
+
+            function keyReleased()
+            {
+               if (keyCode == 32)
+               {
+                  quack.isJumping = false;
+               }
+            }
+
+            window.addEventListener('resize', () =>
+            {
+                location.reload();
+            });
+
+        </script>
+    </body>
+</html>
