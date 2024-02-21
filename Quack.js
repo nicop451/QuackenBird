@@ -10,7 +10,7 @@ class Quack
    this.radius = 25;
 
    this.elapsedTime = 0;
-   this.y = (-windowHeight/2) - 300;
+   this.y = (-windowHeight/2);
    this.x = 300;
    this.acceleration = 0.00;
    this.velocity = 0;
@@ -24,7 +24,7 @@ class Quack
    }
 
    borderCollision() {
-      if(this.elapsedTime > 30) 
+      if(this.elapsedTime > 2) 
       {
          if(windowHeight/2 > (curve.botCurvePoints[60] - this.y) - this.radius) {
             console.log("out");
@@ -32,11 +32,13 @@ class Quack
             this.angularAcc += 0.5;
             this.isDead = true;
             fill(255, 0, 0);
+            location.reaplace('game.html');
          }
          if(windowHeight/2 < (curve.topCurvePoints[60] - this.y) + this.radius) {
             console.log("Out Top");
             this.angularAcc += 0.5;
             this.isDead = true;
+            location.reaplace('game.html');
             fill(0,0,255);
          }
       }
@@ -44,42 +46,46 @@ class Quack
 
    update()
    {
-      this.elapsedTime += deltaTime / 100;
+      this.elapsedTime += deltaTime / 1000;
       this.timeDilation += 0.000001;
 
-      document.getElementById('score').innerText = `Score: ${Math.round(this.elapsedTime)}`;
-
-      this.acceleration += this.gravity;
-      if(!this.isDead)
+      if(this.elapsedTime > 2)
       {
-         // Forces
+         document.getElementById('score').innerText = `Score: ${Math.round(this.elapsedTime)}`;
+
+         this.acceleration += this.gravity;
+         if(!this.isDead)
+         {
+            // Forces
+            if(this.isJumping)
+            {
+               this.acceleration += this.jumpForce;
+            }
+         }
+
+         // Physics Update
+         this.velocity += this.acceleration * deltaTime * this.timeDilation;
+         this.y += this.velocity * deltaTime * this.timeDilation;
+         this.acceleration = 0;
+         this.borderCollision();
+
+
          if(this.isJumping)
          {
-            this.acceleration += this.jumpForce;
+            this.angularAcc += (this.angularPos + 1)*-0.01;
          }
+         else
+         {
+            this.angularAcc += (this.angularPos - 0.8)*-0.01;
+         }
+
+         this.angularAcc += this.angularVel * -0.4;
+
+         this.angularVel += this.angularAcc;
+         this.angularPos += this.angularVel;
+         this.angularAcc = 0;
       }
-
-      // Physics Update
-      this.velocity += this.acceleration * deltaTime * this.timeDilation;
-      this.y += this.velocity * deltaTime * this.timeDilation;
-      this.acceleration = 0;
-      this.borderCollision();
-
-
-      if(this.isJumping)
-      {
-         this.angularAcc += (this.angularPos + 1)*-0.01;
-      }
-      else
-      {
-         this.angularAcc += (this.angularPos - 0.8)*-0.01;
-      }
-
-      this.angularAcc += this.angularVel * -0.4;
-
-      this.angularVel += this.angularAcc;
-      this.angularPos += this.angularVel;
-      this.angularAcc = 0;
+      
 
 
 
