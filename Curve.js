@@ -17,6 +17,8 @@ class CurveModification
       this.isActive = true;
       this.disableDuration = 0;
       this.activate();
+
+      this.tempPoint = createVector(0,0);
    }
 
    activate()
