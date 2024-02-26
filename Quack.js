@@ -32,13 +32,14 @@ class Quack
             this.angularAcc += 0.5;
             this.isDead = true;
             fill(255, 0, 0);
-            // location.reaplace('game.html');
+            //location.replace('QuackenBird/game.html');
          }
          if(windowHeight/2 < (curve.topCurvePoints[60] - this.y) + this.radius) {
             console.log("Out Top");
             this.angularAcc += 0.5;
             this.isDead = true;
             // location.reaplace('game.html');
+            //location.replace('QuackenBird/game.html');
             fill(0,0,255);
          }
       }

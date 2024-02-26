@@ -9,96 +9,95 @@
         <title>Quackenbird</title>
 
         <style>
+            @font-face {
+                font-family: retro;
+                src: url('vcr_osd.ttf');
+            }
+            
             body {
+                background-color: whitesmoke;
+                font-family: retro;
+                color: black;
                 margin: 0;
                 padding: 0;
-                overflow: hidden;
             }
-            #score {
-                position: absolute;
-                top: 0;
-                left: 0;
-                font-size: 20pt;
+
+            #main {
+                margin-top: 80px;
+                width: 50%;
                 padding: 10px;
-                
-                border-bottom-right-radius: 8px;
-                margin: 0;
-                background-color: cadetblue;
+                margin-left: calc(25% - 10px);
+                font-size: 20pt;
+                text-align: center;
+                background-color: #219C90;
+                box-shadow: -2px 2px black, -5px 5px;
+            }
+
+            #main span {
+                display: block;
+                margin: 10px;
+            }
+
+            #description {
+                margin-top: 30px;
+                margin-bottom: 30px;
+                text-align: center;
+                font-size: 12pt;
+                line-height: 25px;
+            }
+
+            img {
+                height: 200px;
+            }
+
+            button {
+                box-shadow: -2px 2px black, -5px 5px;
+                padding: 15px;
+                width: 100px;
+                color: black;
+                font-size: 18pt;
+                cursor: pointer;
+                background-color: #E9B824;
+                border: 2px solid #E9B824;
+                font-family: retro;
+                margin: 20px
             }
         </style>
     </head>
 
     <body>
-        <p id="score">Score: </p>
+        <div id="main">
+            <p id="lastscore">Score: </p>
+            <p id="highscore">Highscore: </p>
+
+            <img id="img" src="quack.png">
+
+            <p id="description">
+                Follow the curve as closely as possible
+                <br>
+                The lower the score the better
+            </p>
+    
+            <button onclick="location.replace('game.html')">Play</button>
+        </div>
+
+        <div id="main">
+            <p>Credits:</p>
+
+            <span>Interface - Ilan</span>
+            <span>Physics - Nico</span>
+            <span>Bird - Mr. Quack</span>
+        </div>
+        <br><br><br>
         
-        <script src="Quack.js"></script>
-        <script src="Curve.js"></script>
         <script>
-            
-            let quack;
-            let curve;
-            let backImage;
-            let n = 0;
-            let elapsedTime = 0;
+            document.getElementById('highscore').innerText = `Highscore: ${localStorage.getItem('highscore') || 'none yet!'}`;
+            document.getElementById('lastscore').innerText = localStorage.getItem('lastscore') ? `Score: ${localStorage.getItem('lastscore')}` : '';
 
-            function setup()
+            if (parseInt(localStorage.getItem('highscore')) < 80)
             {
-               createCanvas(windowWidth, windowHeight);
-
-               quack = new Quack();
-               curve = new Curve(quack);
-
-               quack.curve = curve;
-
-             
+                document.getElementById('img').setAttribute('src', 'yungquack.jpeg');
             }
-
-            function draw()
-            {
-               elapsedTime += deltaTime;
-               clear();
-               colorMode(HSB, 360, 100, 100);
-               background(color(0.001 * elapsedTime % 360 + 200, 50, 70));
-               colorMode(RGB, 255, 255, 255);
-
-               quack.update();
-               curve.update();
-
-               textFont('Courier New', 100);
-               if(elapsedTime < 2000)
-               {
-                  text("Ready", windowWidth/3, windowHeight/2);
-               }
-               else if(elapsedTime > 2000 && elapsedTime < 3000)
-               {
-                  text("Go!", windowWidth/3, windowHeight/2);
-               }
-
-            }
-
-            function keyPressed()
-            {
-               if (keyCode == 32)
-               {
-                  quack.isJumping = true;
-                  quack.angularAcc += (quack.angularPos + 1)*-0.1;
-                  quack.acceleration += 0.1;
-               }
-            }
-
-            function keyReleased()
-            {
-               if (keyCode == 32)
-               {
-                  quack.isJumping = false;
-               }
-            }
-
-            window.addEventListener('resize', () =>
-            {
-                location.reload();
-            });
-
         </script>
     </body>
 </html>

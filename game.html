@@ -9,174 +9,94 @@
         <title>Quackenbird</title>
 
         <style>
-            @font-face {
-                font-family: retro;
-                src: url('vcr_osd.ttf');
-            }
-
             body {
-                background-color: whitesmoke;
-                font-family: retro;
-                color: black;
                 margin: 0;
                 padding: 0;
                 overflow: hidden;
             }
             #score {
                 position: absolute;
-                top: 10px;
-                left: 10px;
+                top: 0;
+                left: 0;
                 font-size: 20pt;
                 padding: 10px;
+                
+                border-bottom-right-radius: 8px;
                 margin: 0;
-                background-color: #219C90;
-                box-shadow: -2px 2px black, -5px 5px;
-            }
-            #time {
-                position: absolute;
-                top: 10px;
-                right: 10px;
-                font-size: 20pt;
-                padding: 10px;
-                margin: 0;
-                background-color: #219C90;
-                box-shadow: -2px 2px black, -5px 5px;
-            }
-
-            #message {
-                background-color: #219C90;
-                padding: 5px;
-                text-align: center;
-                min-width: 50px;
-                position: absolute;
-                top: 50%;
-                transform: translate(30px, 10px);
-                left: 80px;
-                display: none;
-            }
-            #message::before {
-                content: "";
-                width: 0px;
-                height: 0px;
-                position: absolute;
-                border-left: 10px solid #219C90;
-                border-right: 10px solid transparent;
-                border-top: 10px solid #219C90;
-                border-bottom: 10px solid transparent;
-                left: 0px;
-                bottom: -19px;
-            }
-
-            #countdown {
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                font-size: 40pt;
+                background-color: cadetblue;
             }
         </style>
     </head>
 
     <body>
         <p id="score">Score: </p>
-        <p id="time">Time: 30s</p>
-        <p id="message"></p>
-
-        <h1 id="countdown">3</h1>
         
         <script src="Quack.js"></script>
         <script src="Curve.js"></script>
         <script>
-            let elapsedTime = 0;
+            
             let quack;
             let curve;
+            let backImage;
+            let n = 0;
+            let elapsedTime = 0;
+            let isStarted = false;
 
             function setup()
             {
-                createCanvas(windowWidth, windowHeight);
+               createCanvas(windowWidth, windowHeight);
 
-                noLoop();
+               quack = new Quack();
+               curve = new Curve(quack);
 
-                curve = new Curve();
-                quack = new Quack();
-
-                let second = 0;
-
-                let interval = setInterval(() => {
-                    second += 1;
-
-                    document.getElementById('countdown').innerText =  3 - second;
-
-                    if (second == 3)
-                    {
-                        loop();
-                        document.getElementById('countdown').style.display = 'none';
-                        elapsedTime -= 3;
-                        clearInterval(interval);
-                    }
-                }, 1000);
+               quack.curve = curve;
             }
 
             function draw()
             {
-                elapsedTime += deltaTime / 1000;
-                clear();
-                curve.update();
-                quack.update(curve.pos[quack.x + quack.radius]);
+               elapsedTime += deltaTime;
+               clear();
+               colorMode(HSB, 360, 100, 100);
+               background(color(0.001 * elapsedTime % 360 + 200, 50, 70));
+               colorMode(RGB, 255, 255, 255);
 
-                document.getElementById('time').innerText = `Time: ${Math.round(30 - elapsedTime)}s`;
 
-                if (elapsedTime >= 3 && elapsedTime <= 8)
-                {
-                    quack.message.style.display = 'block';
-                    quack.message.innerText = 'BUMS IN THE BACK!';
-                }
-                else
-                {
-                    quack.message.style.display = 'none';
-                }
+               if(isStarted)
+               {
+                  elapsedTime = 0;
+                  textFont('Courier New', 100);
+                  if(elapsedTime < 2000)
+                  {
+                     text("Ready", windowWidth/3, windowHeight/2);
+                  }
+                  else if(elapsedTime > 2000 && elapsedTime < 3000)
+                  {
+                     text("Go!", windowWidth/3, windowHeight/2);
+                  }
 
-                if (elapsedTime >= 30)
-                {
-                    noLoop();
-                    localStorage.setItem('lastscore', Math.round(quack.points));
+               }
+               quack.update();
+               curve.update();
 
-                    let previousHighscore = localStorage.getItem('highscore');
-                    if (previousHighscore)
-                    {
-                        if (Math.round(quack.points) < previousHighscore)
-                        {
-                            localStorage.setItem('highscore', Math.round(quack.points));
-                        }
-                    }
-                    else
-                    {
-                        // there is no highscore yet, use this one
-                        localStorage.setItem('highscore', Math.round(quack.points));
-                    }
 
-                    location.replace('/');
-                }
             }
 
             function keyPressed()
             {
-                if (!isLooping()) return;
-
-                if (keyCode == 32)
-                {
-                    quack.isJumping = true;
-                }
+               if (keyCode == 32)
+               {
+                  quack.isJumping = true;
+                  quack.angularAcc += (quack.angularPos + 1)*-0.1;
+                  quack.acceleration += 0.1;
+               }
             }
 
             function keyReleased()
             {
-                if (!isLooping()) return;
-
-                if (keyCode == 32)
-                {
-                    quack.isJumping = false;
-                }
+               if (keyCode == 32)
+               {
+                  quack.isJumping = false;
+               }
             }
 
             window.addEventListener('resize', () =>
@@ -184,19 +104,6 @@
                 location.reload();
             });
 
-            window.addEventListener('touchstart', () =>
-            {
-                if (!isLooping()) return;
-
-                quack.isJumping = true;
-            });
-
-            window.addEventListener('touchend', () =>
-            {
-                if (!isLooping()) return;
-
-                quack.isJumping = false;
-            });
         </script>
     </body>
 </html>
